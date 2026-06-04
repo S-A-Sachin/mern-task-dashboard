@@ -1,95 +1,139 @@
 import { useState } from "react";
+import "./App.css";
 
 function App() {
   const [task, setTask] = useState("");
-  const [tasks, setTasks] = useState([]);
+  const [priority, setPriority] = useState("Medium");
+
+  const [tasks, setTasks] = useState([
+    {
+      id: 1,
+      name: "Build Login Page",
+      priority: "High",
+      status: "Pending",
+    },
+    {
+      id: 2,
+      name: "Design Dashboard",
+      priority: "Medium",
+      status: "Completed",
+    },
+  ]);
 
   const addTask = () => {
-    if (task.trim() === "") return;
+    if (!task.trim()) return;
 
-    setTasks([
-      ...tasks,
-      {
-        id: Date.now(),
-        text: task,
-        completed: false,
-      },
-    ]);
+    const newTask = {
+      id: Date.now(),
+      name: task,
+      priority,
+      status: "Pending",
+    };
 
+    setTasks([...tasks, newTask]);
     setTask("");
-  };
-
-  const toggleTask = (id) => {
-    setTasks(
-      tasks.map((t) =>
-        t.id === id ? { ...t, completed: !t.completed } : t
-      )
-    );
+    setPriority("Medium");
   };
 
   const deleteTask = (id) => {
     setTasks(tasks.filter((t) => t.id !== id));
   };
 
-  const completedTasks = tasks.filter((t) => t.completed).length;
-  const pendingTasks = tasks.length - completedTasks;
+  const toggleStatus = (id) => {
+    setTasks(
+      tasks.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              status:
+                t.status === "Completed" ? "Pending" : "Completed",
+            }
+          : t
+      )
+    );
+  };
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(
+    (t) => t.status === "Completed"
+  ).length;
+  const pendingTasks = tasks.filter(
+    (t) => t.status === "Pending"
+  ).length;
 
   return (
-    <div style={{ padding: "30px", fontFamily: "Arial" }}>
+    <div className="container">
       <h1>Task Management Dashboard</h1>
 
-      <div style={{ marginBottom: "20px" }}>
+      <div className="cards">
+        <div className="card">
+          <h2>{totalTasks}</h2>
+          <p>Total Tasks</p>
+        </div>
+
+        <div className="card">
+          <h2>{completedTasks}</h2>
+          <p>Completed</p>
+        </div>
+
+        <div className="card">
+          <h2>{pendingTasks}</h2>
+          <p>Pending</p>
+        </div>
+      </div>
+
+      <div className="task-form">
         <input
           type="text"
-          placeholder="Enter Task"
+          placeholder="Enter task..."
           value={task}
           onChange={(e) => setTask(e.target.value)}
-          style={{
-            padding: "10px",
-            width: "250px",
-            marginRight: "10px",
-          }}
         />
+
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+        >
+          <option>High</option>
+          <option>Medium</option>
+          <option>Low</option>
+        </select>
 
         <button onClick={addTask}>Add Task</button>
       </div>
 
-      <h3>Total Tasks: {tasks.length}</h3>
-      <h3>Completed Tasks: {completedTasks}</h3>
-      <h3>Pending Tasks: {pendingTasks}</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
 
-      <hr />
+        <tbody>
+          {tasks.map((t) => (
+            <tr key={t.id}>
+              <td>{t.name}</td>
+              <td>{t.priority}</td>
+              <td>{t.status}</td>
+              <td>
+                <button onClick={() => toggleStatus(t.id)}>
+                  Toggle Status
+                </button>
 
-      {tasks.map((t) => (
-        <div
-          key={t.id}
-          style={{
-            marginBottom: "10px",
-            border: "1px solid gray",
-            padding: "10px",
-          }}
-        >
-          <span
-            style={{
-              textDecoration: t.completed ? "line-through" : "none",
-              marginRight: "15px",
-            }}
-          >
-            {t.text}
-          </span>
-
-          <button onClick={() => toggleTask(t.id)}>
-            {t.completed ? "Undo" : "Complete"}
-          </button>
-
-          <button
-            onClick={() => deleteTask(t.id)}
-            style={{ marginLeft: "10px" }}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+                <button
+                  className="delete"
+                  onClick={() => deleteTask(t.id)}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
