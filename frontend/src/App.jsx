@@ -1,122 +1,97 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [task, setTask] = useState("");
+  const [tasks, setTasks] = useState([]);
+
+  const addTask = () => {
+    if (task.trim() === "") return;
+
+    setTasks([
+      ...tasks,
+      {
+        id: Date.now(),
+        text: task,
+        completed: false,
+      },
+    ]);
+
+    setTask("");
+  };
+
+  const toggleTask = (id) => {
+    setTasks(
+      tasks.map((t) =>
+        t.id === id ? { ...t, completed: !t.completed } : t
+      )
+    );
+  };
+
+  const deleteTask = (id) => {
+    setTasks(tasks.filter((t) => t.id !== id));
+  };
+
+  const completedTasks = tasks.filter((t) => t.completed).length;
+  const pendingTasks = tasks.length - completedTasks;
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
+    <div style={{ padding: "30px", fontFamily: "Arial" }}>
+      <h1>Task Management Dashboard</h1>
+
+      <div style={{ marginBottom: "20px" }}>
+        <input
+          type="text"
+          placeholder="Enter Task"
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          style={{
+            padding: "10px",
+            width: "250px",
+            marginRight: "10px",
+          }}
+        />
+
+        <button onClick={addTask}>Add Task</button>
+      </div>
+
+      <h3>Total Tasks: {tasks.length}</h3>
+      <h3>Completed Tasks: {completedTasks}</h3>
+      <h3>Pending Tasks: {pendingTasks}</h3>
+
+      <hr />
+
+      {tasks.map((t) => (
+        <div
+          key={t.id}
+          style={{
+            marginBottom: "10px",
+            border: "1px solid gray",
+            padding: "10px",
+          }}
         >
-          Count is {count}
-        </button>
-      </section>
+          <span
+            style={{
+              textDecoration: t.completed ? "line-through" : "none",
+              marginRight: "15px",
+            }}
+          >
+            {t.text}
+          </span>
 
-      <div className="ticks"></div>
+          <button onClick={() => toggleTask(t.id)}>
+            {t.completed ? "Undo" : "Complete"}
+          </button>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+          <button
+            onClick={() => deleteTask(t.id)}
+            style={{ marginLeft: "10px" }}
+          >
+            Delete
+          </button>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      ))}
+    </div>
+  );
 }
 
-export default App
+export default App;
